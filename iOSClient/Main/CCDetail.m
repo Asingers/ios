@@ -25,6 +25,9 @@
 #import "AppDelegate.h"
 #import "CCMain.h"
 #import "NCUchardet.h"
+#import "MediaViewController.h"
+#import <KTVHTTPCache/KTVHTTPCache.h>
+
 #import "NCBridgeSwift.h"
 
 #define TOOLBAR_HEIGHT 49.0f
@@ -243,10 +246,15 @@
         [CCGraphics createNewImageFrom:self.metadataDetail.fileNameView fileID:self.metadataDetail.fileID extension:[self.metadataDetail.fileNameView pathExtension] size:@"m" imageForUpload:NO typeFile:self.metadataDetail.typeFile writeImage:YES optimizedFileName:[CCUtility getOptimizedPhoto]];
     }
     
-    if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_image] || [self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_video] || [self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_audio]) {
+    if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_image]) {
         
         self.edgesForExtendedLayout = UIRectEdgeAll;
         [self viewImageVideoAudio];
+    }
+    
+    if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_video] || [self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_audio]) {
+        
+        [self viewMedia];
     }
     
     if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_document]) {
@@ -339,6 +347,35 @@
     }
     
     [self.view addSubview:self.webView];
+}
+
+#pragma --------------------------------------------------------------------------------------------
+#pragma mark ===== View Media =====
+#pragma --------------------------------------------------------------------------------------------
+
+- (void)viewMedia
+{
+    NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:_metadataDetail.directoryID];
+    if (!serverUrl)
+        return;
+    
+    if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView] == NO) {
+        
+    } else {
+        
+        NSMutableDictionary *header = [NSMutableDictionary new];
+        NSString *urlString = [[NSString stringWithFormat:@"%@/%@", serverUrl, _metadataDetail.fileName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        NSString *proxyURLString = [KTVHTTPCache proxyURLStringWithOriginalURLString:urlString];
+
+        NSData *authData = [[NSString stringWithFormat:@"%@:%@", appDelegate.activeUser, appDelegate.activePassword] dataUsingEncoding:NSUTF8StringEncoding];
+        NSString *authValue = [NSString stringWithFormat: @"Basic %@",[authData base64EncodedStringWithOptions:0]];
+        [header setValue:authValue forKey:@"Authorization"];
+        [header setValue:[CCUtility getUserAgent] forKey:@"User-Agent"];        
+        [KTVHTTPCache downloadSetAdditionalHeaders:header];
+
+        MediaViewController *viewController = [[MediaViewController alloc] initWithURLProxyString:proxyURLString metadata:_metadataDetail];
+        [self presentViewController:viewController animated:YES completion:nil];
+    }
 }
 
 #pragma --------------------------------------------------------------------------------------------
@@ -635,6 +672,7 @@
 
 - (void)triggerProgressTask:(NSNotification *)notification
 {
+    /*
     NSDictionary *dict = notification.userInfo;
     NSString *fileID = [dict valueForKey:@"fileID"];
     //NSString *serverUrl = [dict valueForKey:@"serverUrl"];
@@ -643,8 +681,9 @@
     //long long totalBytes = [[dict valueForKey:@"totalBytes"] longLongValue];
     //long long totalBytesExpected = [[dict valueForKey:@"totalBytesExpected"] longLongValue];
     
-//    if ([fileID isEqualToString:_fileIDNowVisible])
-//        [_hud progress:progress];
+    if ([fileID isEqualToString:_fileIDNowVisible])
+        [_hud progress:progress];
+    */
 }
 
 - (void)downloadPhotoBrowserSuccessFailure:(tableMetadata *)metadata selector:(NSString *)selector errorCode:(NSInteger)errorCode

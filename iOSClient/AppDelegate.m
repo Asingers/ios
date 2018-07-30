@@ -38,6 +38,7 @@
 #import "NCAutoUpload.h"
 #import "Firebase.h"
 #import "NCPushNotification.h"
+#import <KTVHTTPCache/KTVHTTPCache.h>
 
 @interface AppDelegate () <UNUserNotificationCenterDelegate, FIRMessagingDelegate>
 
@@ -187,9 +188,12 @@
         [self.reachability startNotifier];
     });
     
-    //AV Session
+    // Media Proxy cache
+    [self setupHTTPCacheMediaProxy];
+    
+    // AV Session
     [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:nil];
-    //[[AVAudioSession sharedInstance] setActive:YES error:nil];
+    // [[AVAudioSession sharedInstance] setActive:YES error:nil];
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     
     // How to hide UINavigationBar 1px bottom line < iOS 11
@@ -1072,6 +1076,30 @@
             aResultHandler(YES);
         } else aResultHandler(NO);
     } else aResultHandler(YES);
+}
+
+#pragma --------------------------------------------------------------------------------------------
+#pragma mark ===== HTTP Cache Media Proxy =====
+#pragma --------------------------------------------------------------------------------------------
+
+- (void)setupHTTPCacheMediaProxy
+{
+    [KTVHTTPCache logSetConsoleLogEnable:YES];
+    NSError * error;
+    [KTVHTTPCache proxyStart:&error];
+    if (error) {
+        NSLog(@"Proxy Start Failure, %@", error);
+    } else {
+        NSLog(@"Proxy Start Success");
+    }
+    [KTVHTTPCache tokenSetURLFilter:^NSURL * (NSURL * URL) {
+        NSLog(@"URL Filter reviced URL : %@", URL);
+        return URL;
+    }];
+    [KTVHTTPCache downloadSetUnsupportContentTypeFilter:^BOOL(NSURL * URL, NSString * contentType) {
+        NSLog(@"Unsupport Content-Type Filter reviced URL : %@, %@", URL, contentType);
+        return NO;
+    }];
 }
 
 #pragma --------------------------------------------------------------------------------------------
