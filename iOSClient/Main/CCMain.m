@@ -4383,17 +4383,25 @@
                 
             } else {
             
-                _metadata.session = k_download_session;
-                _metadata.sessionError = @"";
-                _metadata.sessionSelector = selectorLoadFileView;
-                _metadata.status = k_metadataStatusWaitDownload;
-                
-                // Add Metadata for Download
-                (void)[[NCManageDatabase sharedInstance] addMetadata:_metadata];
-                [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
-                            
-                NSIndexPath *indexPath = [sectionDataSource.fileIDIndexPath objectForKey:_metadata.fileID];
-                if (indexPath) [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                if (([_metadata.typeFile isEqualToString: k_metadataTypeFile_video] || [_metadata.typeFile isEqualToString: k_metadataTypeFile_audio]) && _metadataFolder.e2eEncrypted == NO) {
+                    
+                    if ([self shouldPerformSegue])
+                        [self performSegueWithIdentifier:@"segueDetail" sender:self];
+                    
+                } else {
+                   
+                    _metadata.session = k_download_session;
+                    _metadata.sessionError = @"";
+                    _metadata.sessionSelector = selectorLoadFileView;
+                    _metadata.status = k_metadataStatusWaitDownload;
+                    
+                    // Add Metadata for Download
+                    (void)[[NCManageDatabase sharedInstance] addMetadata:_metadata];
+                    [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
+                    
+                    NSIndexPath *indexPath = [sectionDataSource.fileIDIndexPath objectForKey:_metadata.fileID];
+                    if (indexPath) [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
             }
         }
     }
