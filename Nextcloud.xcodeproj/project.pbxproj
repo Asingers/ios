@@ -378,7 +378,6 @@
 		F78295311F962EFA00A572F5 /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
 		F784FA28210F672E00256C26 /* KTVCocoaHTTPServer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F784FA26210F672E00256C26 /* KTVCocoaHTTPServer.framework */; };
 		F784FA29210F672E00256C26 /* KTVHTTPCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F784FA27210F672E00256C26 /* KTVHTTPCache.framework */; };
-		F784FA2D210F6A3000256C26 /* MediaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F784FA2C210F6A3000256C26 /* MediaViewController.m */; };
 		F784FA2E210F6FC000256C26 /* KTVCocoaHTTPServer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F784FA26210F672E00256C26 /* KTVCocoaHTTPServer.framework */; };
 		F784FA2F210F6FC000256C26 /* KTVCocoaHTTPServer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F784FA26210F672E00256C26 /* KTVCocoaHTTPServer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F784FA30210F6FC500256C26 /* KTVHTTPCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F784FA27210F672E00256C26 /* KTVHTTPCache.framework */; };
@@ -1268,8 +1267,6 @@
 		F784FA25210F672E00256C26 /* KTVHTTPCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVHTTPCache.h; sourceTree = "<group>"; };
 		F784FA26210F672E00256C26 /* KTVCocoaHTTPServer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KTVCocoaHTTPServer.framework; sourceTree = "<group>"; };
 		F784FA27210F672E00256C26 /* KTVHTTPCache.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KTVHTTPCache.framework; sourceTree = "<group>"; };
-		F784FA2B210F6A3000256C26 /* MediaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaViewController.h; sourceTree = "<group>"; };
-		F784FA2C210F6A3000256C26 /* MediaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaViewController.m; sourceTree = "<group>"; };
 		F78964A71EBB576C00403E13 /* JDStatusBarNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JDStatusBarNotification.h; sourceTree = "<group>"; };
 		F78964A81EBB576C00403E13 /* JDStatusBarNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JDStatusBarNotification.m; sourceTree = "<group>"; };
 		F78964A91EBB576C00403E13 /* JDStatusBarStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JDStatusBarStyle.h; sourceTree = "<group>"; };
@@ -2557,15 +2554,6 @@
 			path = KTVHTTPCache;
 			sourceTree = "<group>";
 		};
-		F784FA2A210F6A3000256C26 /* Media */ = {
-			isa = PBXGroup;
-			children = (
-				F784FA2B210F6A3000256C26 /* MediaViewController.h */,
-				F784FA2C210F6A3000256C26 /* MediaViewController.m */,
-			);
-			path = Media;
-			sourceTree = "<group>";
-		};
 		F78964A61EBB576C00403E13 /* JDStatusBarNotification */ = {
 			isa = PBXGroup;
 			children = (
@@ -3182,7 +3170,6 @@
 				F7F54CAC1E5B143100E19C62 /* Library */,
 				F7BFFA621A24D7300044ED85 /* Login */,
 				F7BFCCBD1B68C21900548E76 /* ManageLocation+ManageAsset */,
-				F784FA2A210F6A3000256C26 /* Media */,
 				F7A321891E9E42B20069AD1B /* MenuAccount */,
 				F7F9E3451BC26B19004B9223 /* Move */,
 				F74D3DB81BAC1941000BAE4B /* Networking */,
@@ -3957,7 +3944,6 @@
 				F7BE6E2F1D2D5C3B00106933 /* CCQuickActions.m in Sources */,
 				F762CB101EACB66200B38484 /* NSPredicate+XLFormAdditions.m in Sources */,
 				F7D424691F063B82009C9782 /* CTAssetsGridViewLayout.m in Sources */,
-				F784FA2D210F6A3000256C26 /* MediaViewController.m in Sources */,
 				F7D4237E1F0596C6009C9782 /* ReaderDocument.m in Sources */,
 				F7D424661F063B82009C9782 /* CTAssetsGridViewCell.m in Sources */,
 				F7659A291DC0B726004860C4 /* EAIntroView.m in Sources */,
