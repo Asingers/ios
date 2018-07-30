@@ -355,11 +355,21 @@
 
 - (void)viewMedia
 {
+    NSURL *videoURL;
+    CGFloat safeAreaBottom = 0;
+    
+    if (@available(iOS 11, *)) {
+        safeAreaBottom = [UIApplication sharedApplication].delegate.window.safeAreaInsets.bottom;
+    }
+    
     NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:_metadataDetail.directoryID];
     if (!serverUrl)
         return;
     
-    if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView] == NO) {
+    if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]) {
+        
+        videoURL = [NSURL fileURLWithPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
+        
         
     } else {
         
@@ -372,10 +382,18 @@
         [header setValue:authValue forKey:@"Authorization"];
         [header setValue:[CCUtility getUserAgent] forKey:@"User-Agent"];        
         [KTVHTTPCache downloadSetAdditionalHeaders:header];
-
-        MediaViewController *viewController = [[MediaViewController alloc] initWithURLProxyString:proxyURLString metadata:_metadataDetail];
-        [self presentViewController:viewController animated:YES completion:nil];
     }
+    
+    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:videoURL];
+    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
+    AVPlayerViewController *playesController = [AVPlayerViewController new];
+
+    playesController.player = player;
+    playesController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
+    [self addChildViewController:playesController];
+    [self.view addSubview:playesController.view];
+    
+    [player play];
 }
 
 #pragma --------------------------------------------------------------------------------------------
