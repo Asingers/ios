@@ -93,6 +93,12 @@
 
     self.imageBackground.image = [UIImage imageNamed:@"backgroundDetail"];
     
+    // Proxy
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self setupHTTPCache];
+    });
+    
     // Change bar bottom line shadow
     self.navigationController.navigationBar.shadowImage = [CCGraphics generateSinglePixelImageWithColor:[NCBrandColor sharedInstance].brand];
     
@@ -254,6 +260,7 @@
     
     if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_video] || [self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_audio]) {
         
+        [self createToolbar];
         [self viewMedia];
     }
     
@@ -366,17 +373,17 @@
     if (!serverUrl)
         return;
     
-    if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]) {
+    if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView] == NO) {
         
         videoURL = [NSURL fileURLWithPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
         
         
     } else {
         
-        NSMutableDictionary *header = [NSMutableDictionary new];
-        NSString *urlString = [[NSString stringWithFormat:@"%@/%@", serverUrl, _metadataDetail.fileName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-        NSString *proxyURLString = [KTVHTTPCache proxyURLStringWithOriginalURLString:urlString];
+        NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"%@/%@", serverUrl, _metadataDetail.fileName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
+        videoURL = [KTVHTTPCache proxyURLWithOriginalURL:url];
 
+        NSMutableDictionary *header = [NSMutableDictionary new];
         NSData *authData = [[NSString stringWithFormat:@"%@:%@", appDelegate.activeUser, appDelegate.activePassword] dataUsingEncoding:NSUTF8StringEncoding];
         NSString *authValue = [NSString stringWithFormat: @"Basic %@",[authData base64EncodedStringWithOptions:0]];
         [header setValue:authValue forKey:@"Authorization"];
@@ -394,6 +401,27 @@
     [self.view addSubview:playesController.view];
     
     [player play];
+}
+
+- (void)setupHTTPCache
+{
+    [KTVHTTPCache logSetConsoleLogEnable:YES];
+    NSError * error;
+    [KTVHTTPCache proxyStart:&error];
+    if (error) {
+        NSLog(@"Proxy Start Failure, %@", error);
+    } else {
+        NSLog(@"Proxy Start Success");
+    }
+    [KTVHTTPCache tokenSetURLFilter:^NSURL * (NSURL * URL) {
+        
+        NSLog(@"URL Filter reviced URL : %@", URL);
+        return URL;
+    }];
+    [KTVHTTPCache downloadSetUnsupportContentTypeFilter:^BOOL(NSURL * URL, NSString * contentType) {
+        NSLog(@"Unsupport Content-Type Filter reviced URL : %@, %@", URL, contentType);
+        return NO;
+    }];
 }
 
 #pragma --------------------------------------------------------------------------------------------
