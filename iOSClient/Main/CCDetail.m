@@ -373,12 +373,11 @@
     if (!serverUrl)
         return;
     
-//    if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView] == NO) {
+    if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]) {
     
         videoURL = [NSURL fileURLWithPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
         
-        
-//    } else {
+    } else {
     
         NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"%@/%@", serverUrl, _metadataDetail.fileName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
         videoURL = [KTVHTTPCache proxyURLWithOriginalURL:url];
@@ -389,7 +388,7 @@
         [header setValue:authValue forKey:@"Authorization"];
         [header setValue:[CCUtility getUserAgent] forKey:@"User-Agent"];        
         [KTVHTTPCache downloadSetAdditionalHeaders:header];
-//    }
+    }
     
     AVPlayer *player = [AVPlayer playerWithURL:videoURL];
     AVPlayerViewController *playesController = [AVPlayerViewController new];
