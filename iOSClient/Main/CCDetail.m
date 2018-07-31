@@ -408,6 +408,7 @@
         
         //
         _buttonAction.enabled = false;
+        
     }
     
     self.player = [AVPlayer playerWithURL:videoURLProxy];
