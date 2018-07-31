@@ -369,9 +369,8 @@
         [header setValue:[CCUtility getUserAgent] forKey:@"User-Agent"];        
         [KTVHTTPCache downloadSetAdditionalHeaders:header];
         
-        //
+        // Disable Button Action (the file is in download via Proxy Server)
         buttonAction.enabled = false;
-        
     }
     
     appDelegate.player = [AVPlayer playerWithURL:videoURLProxy];
@@ -420,6 +419,7 @@
             // reload Main
             [appDelegate.activeMain reloadDatasource];
             
+            // Enabled Button Action (the file is in local)
             buttonAction.enabled = true;
         }
     }
