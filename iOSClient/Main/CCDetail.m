@@ -412,8 +412,10 @@
     if (![CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]) {
         NSURL *url = [KTVHTTPCache cacheCompleteFileURLIfExistedWithURL:videoURL];
         if (url) {
+            
             [CCUtility copyFileAtPath:[url path] toPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
             [[NCManageDatabase sharedInstance] addLocalFileWithMetadata:self.metadataDetail];
+            [KTVHTTPCache cacheDeleteAllCaches];
             
             // reload Main
             [appDelegate.activeMain reloadDatasource];
@@ -425,7 +427,9 @@
 
 - (void)setupHTTPCache
 {
+    [KTVHTTPCache cacheSetMaxCacheLength:k_maxHTTPCache];
     [KTVHTTPCache logSetConsoleLogEnable:YES];
+    
     NSError * error;
     [KTVHTTPCache proxyStart:&error];
     if (error) {
@@ -433,11 +437,12 @@
     } else {
         NSLog(@"Proxy Start Success");
     }
+    
     [KTVHTTPCache tokenSetURLFilter:^NSURL * (NSURL * URL) {
-        
         NSLog(@"URL Filter reviced URL : %@", URL);
         return URL;
     }];
+    
     [KTVHTTPCache downloadSetUnsupportContentTypeFilter:^BOOL(NSURL * URL, NSString * contentType) {
         NSLog(@"Unsupport Content-Type Filter reviced URL : %@, %@", URL, contentType);
         return NO;
