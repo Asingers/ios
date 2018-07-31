@@ -160,7 +160,7 @@
 - (void)backNavigationController
 {
     [self removeAllSubView];
-    [self.navigationController popViewControllerAnimated:NO];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)changeToDisplayMode
@@ -402,7 +402,7 @@
 }
 
 - (void)itemDidFinishPlaying:(NSNotification *)notification
-{    
+{
     AVPlayerItem *player = [notification object];
     [player seekToTime:kCMTimeZero];    
 }
@@ -414,6 +414,8 @@
         if (url) {
             [CCUtility copyFileAtPath:[url path] toPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
             [[NCManageDatabase sharedInstance] addLocalFileWithMetadata:self.metadataDetail];
+            
+            buttonAction.enabled = true;
         }
     }
 }
@@ -1006,39 +1008,21 @@
         
         if (errorCode == 0) {
             
-            // reload Main
-            [appDelegate.activeMain reloadDatasource];
-            
-            // If removed document (web) or PDF close
-            if (_webView || _readerPDFViewController) {
-                for (UIView *view in [appDelegate.activeDetail.view subviews]) {
-                    if ([view isKindOfClass:[UIImageView class]] == NO) {
-                        [view removeFromSuperview];
-                    }
-                }
-            }
-            
             // if a message for a directory of these
             if (![dataSourceDirectoryID containsObject:metadata.directoryID])
                 return;
             
-            // if we are not in browserPhoto and it's removed photo/video in preview then "< Back"
-            if (!self.photoBrowser && [self.metadataDetail.fileID isEqualToString:metadata.fileID]) {
-                
-                NSArray *viewsToRemove = [self.view subviews];
-                for (id element in viewsToRemove) {
-                    
-                    if ([element isMemberOfClass:[UIView class]] || [element isMemberOfClass:[UIToolbar class]])
-                        [element removeFromSuperview];
-                }
-                
-                self.title = @"";
-                
-                [self.navigationController popViewControllerAnimated:YES];
-                
+            // reload Main
+            [appDelegate.activeMain reloadDatasource];
+            
+            // Not image
+            if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_image] == NO) {
+            
+                // exit
+                [self backNavigationController];
+            
             } else {
                 
-                // only photoBrowser if exists
                 for (NSUInteger index=0; index < [self.dataSourceImagesVideos count] && _photoBrowser; index++ ) {
                     
                     tableMetadata *metadataTemp = [self.dataSourceImagesVideos objectAtIndex:index];
@@ -1049,11 +1033,9 @@
                         [self.photos removeObjectAtIndex:index];
                         [self.photoBrowser reloadData];
                         
-                        // Title
+                        // exit
                         if ([self.dataSourceImagesVideos count] == 0) {
-                            
-                            self.title = @"";
-                            [self.navigationController popViewControllerAnimated:YES];
+                            [self backNavigationController];
                         }
                     }
                 }
