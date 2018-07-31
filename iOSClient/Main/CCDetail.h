@@ -41,11 +41,15 @@
 // Document
 @property (nonatomic, strong) WKWebView *webView;
 
-// Photo-Video
+// Photo
 @property (nonatomic, strong) NSMutableArray *dataSourceImagesVideos;
 
 @property (nonatomic, strong) MWPhotoBrowser *photoBrowser;
 @property (nonatomic, strong) NSMutableArray *photos;
+
+// Audio Video
+@property (nonatomic, strong) AVPlayer *player;
+@property (nonatomic, strong) AVPlayerViewController *playerController;
 
 // PDF
 @property (nonatomic, strong) ReaderViewController *readerPDFViewController;

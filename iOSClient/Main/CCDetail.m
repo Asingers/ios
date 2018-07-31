@@ -25,7 +25,6 @@
 #import "AppDelegate.h"
 #import "CCMain.h"
 #import "NCUchardet.h"
-#import "MediaViewController.h"
 #import <KTVHTTPCache/KTVHTTPCache.h>
 
 #import "NCBridgeSwift.h"
@@ -159,11 +158,22 @@
         _readerPDFViewController = nil;
     }
         
-    // Photo-Video-Audio
+    // Photo
     if (_photoBrowser) {
         [_photos removeAllObjects];
         _photoBrowser.delegate = nil;
         _photoBrowser = nil;
+    }
+    
+    // Media
+    if (self.player) {
+        [self.player pause];
+        [self.player.currentItem.asset cancelLoading];
+        [self.player.currentItem cancelPendingSeeks];
+        [self.player cancelPendingPrerolls];
+        [self.playerController.view removeFromSuperview];
+        self.player = nil;
+        self.playerController = nil;
     }
     
     // ToolBar
@@ -390,15 +400,15 @@
         [KTVHTTPCache downloadSetAdditionalHeaders:header];
     }
     
-    AVPlayer *player = [AVPlayer playerWithURL:videoURL];
-    AVPlayerViewController *playesController = [AVPlayerViewController new];
+    self.player = [AVPlayer playerWithURL:videoURL];
+    self.playerController = [AVPlayerViewController new];
 
-    playesController.player = player;
-    playesController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
-    [self addChildViewController:playesController];
-    [self.view addSubview:playesController.view];
+    self.playerController.player = self.player;
+    self.playerController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
+    [self addChildViewController:self.playerController];
+    [self.view addSubview:self.playerController.view];
     
-    [player play];
+    [self.player play];
 }
 
 - (void)setupHTTPCache
