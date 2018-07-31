@@ -115,7 +115,6 @@
     }
 }
 
-// Apparirà
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -124,7 +123,6 @@
     self.tabBarController.tabBar.translucent = YES;
 }
 
-// E' scomparso
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
@@ -226,6 +224,8 @@
             [appDelegate aspectNavigationControllerBar:self.navigationController.navigationBar online:[appDelegate.reachability isReachable] hidden:NO];
         }
     }
+    
+    self.title = _metadataDetail.fileNameView;
 }
 
 #pragma --------------------------------------------------------------------------------------------
