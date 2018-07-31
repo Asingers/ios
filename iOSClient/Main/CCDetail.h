@@ -46,7 +46,6 @@
 
 // Photo
 @property (nonatomic, strong) NSMutableArray *dataSourceImagesVideos;
-
 @property (nonatomic, strong) MWPhotoBrowser *photoBrowser;
 @property (nonatomic, strong) NSMutableArray *photos;
 
