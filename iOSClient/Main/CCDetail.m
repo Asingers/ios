@@ -428,7 +428,10 @@
 - (void)setupHTTPCache
 {
     [KTVHTTPCache cacheSetMaxCacheLength:k_maxHTTPCache];
+    
+#if TARGET_IPHONE_SIMULATOR
     [KTVHTTPCache logSetConsoleLogEnable:YES];
+#endif
     
     NSError * error;
     [KTVHTTPCache proxyStart:&error];
