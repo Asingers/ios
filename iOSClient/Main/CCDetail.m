@@ -415,6 +415,9 @@
             [CCUtility copyFileAtPath:[url path] toPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
             [[NCManageDatabase sharedInstance] addLocalFileWithMetadata:self.metadataDetail];
             
+            // reload Main
+            [appDelegate.activeMain reloadDatasource];
+            
             buttonAction.enabled = true;
         }
     }
@@ -1007,10 +1010,6 @@
     [[NCMainCommon sharedInstance ] deleteFileWithMetadatas:[[NSArray alloc] initWithObjects:metadata, nil] e2ee:tableDirectory.e2eEncrypted serverUrl:serverUrl folderFileID:tableDirectory.fileID completion:^(NSInteger errorCode, NSString *message) {
         
         if (errorCode == 0) {
-            
-            // if a message for a directory of these
-            if (![dataSourceDirectoryID containsObject:metadata.directoryID])
-                return;
             
             // reload Main
             [appDelegate.activeMain reloadDatasource];
