@@ -36,9 +36,7 @@
 @interface CCDetail ()
 {
     AppDelegate *appDelegate;
-    
-    UIToolbar *_toolbar;
-    
+        
     UIBarButtonItem *_buttonModifyTxt;
     UIBarButtonItem *_buttonAction;
     UIBarButtonItem *_buttonShare;
@@ -104,6 +102,12 @@
     // Change bar bottom line shadow
     self.navigationController.navigationBar.shadowImage = [CCGraphics generateSinglePixelImageWithColor:[NCBrandColor sharedInstance].brand];
     
+    // TabBar
+    self.tabBarController.tabBar.hidden = YES;
+    self.tabBarController.tabBar.translucent = YES;
+    
+    // Open View
+    [self removeAllSubView];
     if ([self.metadataDetail.fileNameView length] > 0 || [self.metadataDetail.directoryID length] > 0 || [self.metadataDetail.fileID length] > 0) {
     
         // open view
@@ -111,6 +115,7 @@
     }
 }
 
+/*
 // Apparirà
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -125,73 +130,41 @@
     if (self.splitViewController.isCollapsed)
         [appDelegate plusButtonVisibile:false];
 }
+*/
 
 // E' scomparso
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     
-    // remove all
-    if (self.isMovingFromParentViewController)
-        [self removeAllView];    
 }
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+- (void)changeTheming
 {
-    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        
-    }];
+    [appDelegate changeTheming:self];
     
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    if (self.toolbar) {
+        self.toolbar.barTintColor = [NCBrandColor sharedInstance].tabBar;
+        self.toolbar.tintColor = [NCBrandColor sharedInstance].brandElement;
+    }
 }
 
-// remove all view
-- (void)removeAllView
+- (void)removeAllSubView
 {
-    // Document
-    if (_webView) {
-        [_webView removeFromSuperview];
-        _webView = nil;
+    for (UIView *view in [self.view subviews]) {
+        if ([view isKindOfClass:[UIImageView class]] == NO) {
+            [view removeFromSuperview];
+        }
     }
-        
-    // PDF
-    if (_readerPDFViewController) {
-        [_readerPDFViewController.view removeFromSuperview];
-        _readerPDFViewController.delegate = nil;
-        _readerPDFViewController = nil;
-    }
-        
-    // Photo
-    if (_photoBrowser) {
-        [_photos removeAllObjects];
-        _photoBrowser.delegate = nil;
-        _photoBrowser = nil;
-    }
-    
-    // Media
-    if (self.player) {
-        [self.player pause];
-        [self.player.currentItem.asset cancelLoading];
-        [self.player.currentItem cancelPendingSeeks];
-        [self.player cancelPendingPrerolls];
-        [self.playerController.view removeFromSuperview];
-        self.player = nil;
-        self.playerController = nil;
-    }
-    
-    // ToolBar
-    if (_toolbar) {
-        [_toolbar removeFromSuperview];
-        _toolbar = nil;
-    }
-    
-    // Title
-    self.title = nil;
+    self.webView = nil;
+    self.readerPDFViewController = nil;
+    self.photoBrowser = nil;
+    self.toolbar = nil;
 }
 
 - (void)backNavigationController
 {
-    [self removeAllView];
+    [self removeAllSubView];
     [self.navigationController popViewControllerAnimated:NO];
 }
 
@@ -201,66 +174,12 @@
         [self.readerPDFViewController updateContentViews];
 }
 
-- (void)createToolbar
-{
-    CGFloat safeAreaBottom = 0;
-    NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:_metadataDetail.directoryID];
-    if (!serverUrl)
-        return;
-    
-    if (@available(iOS 11, *)) {
-        safeAreaBottom = [UIApplication sharedApplication].delegate.window.safeAreaInsets.bottom;
-    }
-    
-    _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom, self.view.bounds.size.width, TOOLBAR_HEIGHT)];
-    
-    UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
-    UIBarButtonItem *fixedSpaceMini = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
-    fixedSpaceMini.width = 25;
-    
-    _buttonModifyTxt = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"actionSheetModify"] style:UIBarButtonItemStylePlain target:self action:@selector(modifyTxtButtonPressed:)];
-    _buttonAction = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"openFile"] style:UIBarButtonItemStylePlain target:self action:@selector(actionButtonPressed:)];
-    _buttonShare  = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"share"] style:UIBarButtonItemStylePlain target:self action:@selector(shareButtonPressed:)];
-    _buttonDelete = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteButtonPressed:)];
-    
-    if ([CCUtility isDocumentModifiableExtension:_fileNameExtension]) {
-        if ([CCUtility isFolderEncrypted:serverUrl account:appDelegate.activeAccount]) // E2EE
-            [_toolbar setItems:[NSArray arrayWithObjects: _buttonModifyTxt, flexible, _buttonDelete, fixedSpaceMini, _buttonAction,  nil]];
-        else
-            [_toolbar setItems:[NSArray arrayWithObjects: _buttonModifyTxt, flexible, _buttonDelete, fixedSpaceMini, _buttonShare, fixedSpaceMini, _buttonAction,  nil]];
-    } else {
-        if ([CCUtility isFolderEncrypted:serverUrl account:appDelegate.activeAccount]) // E2EE
-            [_toolbar setItems:[NSArray arrayWithObjects: flexible, _buttonDelete, fixedSpaceMini, _buttonAction,  nil]];
-        else
-            [_toolbar setItems:[NSArray arrayWithObjects: flexible, _buttonDelete, fixedSpaceMini, _buttonShare, fixedSpaceMini, _buttonAction,  nil]];
-    }
-    
-    [_toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
-    
-    _toolbar.barTintColor = [NCBrandColor sharedInstance].tabBar;
-    _toolbar.tintColor = [NCBrandColor sharedInstance].brandElement;
-
-    [self.view addSubview:_toolbar];
-}
-
-- (void)changeTheming
-{
-    [appDelegate changeTheming:self];
-    
-    if (_toolbar) {
-        _toolbar.barTintColor = [NCBrandColor sharedInstance].tabBar;
-        _toolbar.tintColor = [NCBrandColor sharedInstance].brandElement;
-    }    
-}
-
 #pragma --------------------------------------------------------------------------------------------
 #pragma mark ===== View File  =====
 #pragma --------------------------------------------------------------------------------------------
 
 - (void)viewFile
 {
-    [self removeAllView];
-    
     // verifico se esiste l'icona e se la posso creare
     if ([[NSFileManager defaultManager] fileExistsAtPath:[CCUtility getDirectoryProviderStorageIconFileID:self.metadataDetail.fileID fileNameView:self.metadataDetail.fileNameView]] == NO) {
         
@@ -291,15 +210,61 @@
             [self viewPDF:@""];
             [self createToolbar];
             [appDelegate aspectNavigationControllerBar:self.navigationController.navigationBar online:[appDelegate.reachability isReachable] hidden:NO];
-
+            
         } else {
-
+            
             self.edgesForExtendedLayout = UIRectEdgeBottom;
             [self viewDocument];
             [self createToolbar];
             [appDelegate aspectNavigationControllerBar:self.navigationController.navigationBar online:[appDelegate.reachability isReachable] hidden:NO];
         }
     }
+}
+
+#pragma --------------------------------------------------------------------------------------------
+#pragma mark ===== Toolbar  =====
+#pragma --------------------------------------------------------------------------------------------
+
+- (void)createToolbar
+{
+    CGFloat safeAreaBottom = 0;
+    NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:_metadataDetail.directoryID];
+    if (!serverUrl)
+        return;
+    
+    if (@available(iOS 11, *)) {
+        safeAreaBottom = [UIApplication sharedApplication].delegate.window.safeAreaInsets.bottom;
+    }
+    
+    self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom, self.view.bounds.size.width, TOOLBAR_HEIGHT)];
+    
+    UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    UIBarButtonItem *fixedSpaceMini = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
+    fixedSpaceMini.width = 25;
+    
+    _buttonModifyTxt = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"actionSheetModify"] style:UIBarButtonItemStylePlain target:self action:@selector(modifyTxtButtonPressed:)];
+    _buttonAction = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"openFile"] style:UIBarButtonItemStylePlain target:self action:@selector(actionButtonPressed:)];
+    _buttonShare  = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"share"] style:UIBarButtonItemStylePlain target:self action:@selector(shareButtonPressed:)];
+    _buttonDelete = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteButtonPressed:)];
+    
+    if ([CCUtility isDocumentModifiableExtension:_fileNameExtension]) {
+        if ([CCUtility isFolderEncrypted:serverUrl account:appDelegate.activeAccount]) // E2EE
+            [self.toolbar setItems:[NSArray arrayWithObjects: _buttonModifyTxt, flexible, _buttonDelete, fixedSpaceMini, _buttonAction,  nil]];
+        else
+            [self.toolbar setItems:[NSArray arrayWithObjects: _buttonModifyTxt, flexible, _buttonDelete, fixedSpaceMini, _buttonShare, fixedSpaceMini, _buttonAction,  nil]];
+    } else {
+        if ([CCUtility isFolderEncrypted:serverUrl account:appDelegate.activeAccount]) // E2EE
+            [self.toolbar setItems:[NSArray arrayWithObjects: flexible, _buttonDelete, fixedSpaceMini, _buttonAction,  nil]];
+        else
+            [self.toolbar setItems:[NSArray arrayWithObjects: flexible, _buttonDelete, fixedSpaceMini, _buttonShare, fixedSpaceMini, _buttonAction,  nil]];
+    }
+    
+    [self.toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
+    
+    self.toolbar.barTintColor = [NCBrandColor sharedInstance].tabBar;
+    self.toolbar.tintColor = [NCBrandColor sharedInstance].brandElement;
+
+    [self.view addSubview:self.toolbar];
 }
 
 #pragma --------------------------------------------------------------------------------------------
@@ -411,17 +376,17 @@
         
     }
     
-    self.player = [AVPlayer playerWithURL:videoURLProxy];
-    self.playerController = [AVPlayerViewController new];
+    appDelegate.player = [AVPlayer playerWithURL:videoURLProxy];
+    appDelegate.playerController = [AVPlayerViewController new];
 
-    self.playerController.player = self.player;
-    self.playerController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
-    [self addChildViewController:self.playerController];
-    [self.view addSubview:self.playerController.view];
-    [self.playerController didMoveToParentViewController:self];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:[self.player currentItem]];
+    appDelegate.playerController.player = appDelegate.player;
+    appDelegate.playerController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
+    [self addChildViewController:appDelegate.playerController];
+    [self.view addSubview:appDelegate.playerController.view];
+    [appDelegate.playerController didMoveToParentViewController:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:[appDelegate.player currentItem]];
 
-    [self.player play];
+    [appDelegate.player play];
 }
 
 - (void)itemDidFinishPlaying:(NSNotification *)notification {
@@ -739,7 +704,6 @@
 
 - (void)photoBrowserDidFinishPresentation:(MWPhotoBrowser *)photoBrowser
 {
-    [self removeAllView];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -985,9 +949,9 @@
     }
     
     self.navigationController.navigationBarHidden = !self.navigationController.navigationBarHidden;
-    _toolbar.hidden = !_toolbar.isHidden;
+    self.toolbar.hidden = !self.toolbar.isHidden;
     
-    if (_toolbar.isHidden) {
+    if (self.toolbar.isHidden) {
         self.readerPDFViewController.view.frame = CGRectMake(0, safeAreaTop, self.view.bounds.size.width, self.view.bounds.size.height - safeAreaTop - safeAreaBottom);
     } else {
         self.readerPDFViewController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
@@ -1023,8 +987,13 @@
             [appDelegate.activeMain reloadDatasource];
             
             // If removed document (web) or PDF close
-            if (_webView || _readerPDFViewController)
-                [self removeAllView];
+            if (_webView || _readerPDFViewController) {
+                for (UIView *view in [appDelegate.activeDetail.view subviews]) {
+                    if ([view isKindOfClass:[UIImageView class]] == NO) {
+                        [view removeFromSuperview];
+                    }
+                }
+            }
             
             // if a message for a directory of these
             if (![_dataSourceDirectoryID containsObject:metadata.directoryID])

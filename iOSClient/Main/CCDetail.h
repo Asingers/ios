@@ -38,6 +38,9 @@
 @property (nonatomic, strong) tableMetadata *metadataDetail;
 @property (nonatomic, strong) NSDate *dateFilterQuery;
 
+// Toolbar
+@property (nonatomic, strong) UIToolbar *toolbar;
+
 // Document
 @property (nonatomic, strong) WKWebView *webView;
 
@@ -46,10 +49,6 @@
 
 @property (nonatomic, strong) MWPhotoBrowser *photoBrowser;
 @property (nonatomic, strong) NSMutableArray *photos;
-
-// Audio Video
-@property (nonatomic, strong) AVPlayer *player;
-@property (nonatomic, strong) AVPlayerViewController *playerController;
 
 // PDF
 @property (nonatomic, strong) ReaderViewController *readerPDFViewController;
@@ -60,10 +59,8 @@
 
 @property(nonatomic, weak) IBOutlet UIImageView *imageBackground;
 
-- (void)removeAllView;
-
+- (void)removeAllSubView;
 - (void)changeToDisplayMode;
-
 - (void)downloadPhotoBrowserSuccessFailure:(tableMetadata *)metadata selector:(NSString *)selector errorCode:(NSInteger)errorCode;
 
 @end

@@ -375,7 +375,7 @@
         [appDelegate settingThemingColorBrand];
         
         // remove all of detail
-        [appDelegate.activeDetail removeAllView];
+        [appDelegate.activeDetail removeAllSubView];
         
         // remove all Notification Messages
         [appDelegate.listOfNotifications removeAllObjects];
