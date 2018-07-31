@@ -415,7 +415,7 @@
             
             [CCUtility copyFileAtPath:[url path] toPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
             [[NCManageDatabase sharedInstance] addLocalFileWithMetadata:self.metadataDetail];
-            [KTVHTTPCache cacheDeleteAllCaches];
+            [KTVHTTPCache cacheDeleteCacheWithURL:videoURL];
             
             // reload Main
             [appDelegate.activeMain reloadDatasource];
