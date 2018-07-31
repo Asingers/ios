@@ -49,6 +49,9 @@
     
     NSMutableOrderedSet *_dataSourceDirectoryID;
     NSString *_fileNameExtension;
+    
+    NSURL *videoURLProxy;
+    NSURL *videoURL;
 }
 @end
 
@@ -256,6 +259,8 @@
 
 - (void)viewFile
 {
+    [self removeAllView];
+    
     // verifico se esiste l'icona e se la posso creare
     if ([[NSFileManager defaultManager] fileExistsAtPath:[CCUtility getDirectoryProviderStorageIconFileID:self.metadataDetail.fileID fileNameView:self.metadataDetail.fileNameView]] == NO) {
         
@@ -270,8 +275,10 @@
     
     if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_video] || [self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_audio]) {
         
+        self.edgesForExtendedLayout = UIRectEdgeAll;
         [self createToolbar];
         [self viewMedia];
+        [appDelegate aspectNavigationControllerBar:self.navigationController.navigationBar online:[appDelegate.reachability isReachable] hidden:NO];
     }
     
     if ([self.metadataDetail.typeFile isEqualToString: k_metadataTypeFile_document]) {
@@ -372,7 +379,6 @@
 
 - (void)viewMedia
 {
-    NSURL *videoURL;
     CGFloat safeAreaBottom = 0;
     
     if (@available(iOS 11, *)) {
@@ -386,11 +392,12 @@
     if ([CCUtility fileProviderStorageExists:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]) {
     
         videoURL = [NSURL fileURLWithPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView]];
+        videoURLProxy = videoURL;
         
     } else {
     
-        NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"%@/%@", serverUrl, _metadataDetail.fileName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
-        videoURL = [KTVHTTPCache proxyURLWithOriginalURL:url];
+        videoURL = [NSURL URLWithString:[[NSString stringWithFormat:@"%@/%@", serverUrl, _metadataDetail.fileName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
+        videoURLProxy = [KTVHTTPCache proxyURLWithOriginalURL:videoURL];
 
         NSMutableDictionary *header = [NSMutableDictionary new];
         NSData *authData = [[NSString stringWithFormat:@"%@:%@", appDelegate.activeUser, appDelegate.activePassword] dataUsingEncoding:NSUTF8StringEncoding];
@@ -398,17 +405,28 @@
         [header setValue:authValue forKey:@"Authorization"];
         [header setValue:[CCUtility getUserAgent] forKey:@"User-Agent"];        
         [KTVHTTPCache downloadSetAdditionalHeaders:header];
+        
+        //
+        _buttonAction.enabled = false;
     }
     
-    self.player = [AVPlayer playerWithURL:videoURL];
+    self.player = [AVPlayer playerWithURL:videoURLProxy];
     self.playerController = [AVPlayerViewController new];
 
     self.playerController.player = self.player;
     self.playerController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
     [self addChildViewController:self.playerController];
     [self.view addSubview:self.playerController.view];
-    
+    [self.playerController didMoveToParentViewController:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:[self.player currentItem]];
+
     [self.player play];
+}
+
+- (void)itemDidFinishPlaying:(NSNotification *)notification {
+    
+    AVPlayerItem *player = [notification object];
+    [player seekToTime:kCMTimeZero];
 }
 
 - (void)setupHTTPCache
