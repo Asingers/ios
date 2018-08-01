@@ -70,7 +70,7 @@
 
         self.metadataDetail = [[tableMetadata alloc] init];
         self.photos = [[NSMutableArray alloc] init];
-        self.dataSourceImagesVideos = [[NSMutableArray alloc] init];
+        self.photoDataSource = [NSMutableArray new];
         dataSourceDirectoryID = [[NSMutableOrderedSet alloc] init];
         indexNowVisible = -1;
         fileIDNowVisible = nil;
@@ -451,7 +451,7 @@
     [dataSourceDirectoryID removeAllObjects];
     
     // if not images, exit
-    if ([self.dataSourceImagesVideos count] == 0)
+    if ([self.photoDataSource count] == 0)
         return;
     
     // test
@@ -460,7 +460,7 @@
         return;
     
     NSUInteger index = 0;
-    for (tableMetadata *metadata in self.dataSourceImagesVideos) {
+    for (tableMetadata *metadata in self.photoDataSource) {
         
         // start from here ?
         if (self.metadataDetail.fileID && [metadata.fileID isEqualToString:self.metadataDetail.fileID])
@@ -504,12 +504,12 @@
 
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser
 {
-    return [self.dataSourceImagesVideos count];
+    return [self.photoDataSource count];
 }
 
 - (NSString *)photoBrowser:(MWPhotoBrowser *)photoBrowser titleForPhotoAtIndex:(NSUInteger)index
 {
-    tableMetadata *metadata = [self.dataSourceImagesVideos objectAtIndex:index];
+    tableMetadata *metadata = [self.photoDataSource objectAtIndex:index];
     
     NSString *titleDir = metadata.fileNameView;
     self.title = titleDir;
@@ -519,7 +519,7 @@
 
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser didDisplayPhotoAtIndex:(NSUInteger)index
 {
-    tableMetadata *metadata = [self.dataSourceImagesVideos objectAtIndex:index];
+    tableMetadata *metadata = [self.photoDataSource objectAtIndex:index];
     
     indexNowVisible = index;
     fileIDNowVisible = metadata.fileID;
@@ -533,7 +533,7 @@
 
         if ([CCUtility fileProviderStorageExists:metadata.fileID fileName:metadata.fileNameView] == NO && metadataDB.status == k_metadataStatusNormal) {
             
-            [self downloadPhotoBrowser:metadata];
+            [self downloadPhotoBrowser:metadata.fileID];
         }
     }
     
@@ -547,7 +547,7 @@
     UIImage *image;
 //    UIImage *loadingGIF = [UIImage animatedImageWithAnimatedGIFURL:[[NSBundle mainBundle] URLForResource:@"loading" withExtension:@"gif"]];
 
-    tableMetadata *metadata = [self.dataSourceImagesVideos objectAtIndex:index];
+    tableMetadata *metadata = [self.photoDataSource objectAtIndex:index];
     
     if (index < self.photos.count) {
         
@@ -672,7 +672,7 @@
 
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser actionButtonPressedForPhotoAtIndex:(NSUInteger)index
 {
-    tableMetadata *metadata = [self.dataSourceImagesVideos objectAtIndex:index];
+    tableMetadata *metadata = [self.photoDataSource objectAtIndex:index];
     if (metadata == nil) return;
 
     self.docController = [UIDocumentInteractionController interactionControllerWithURL:[NSURL fileURLWithPath:[CCUtility getDirectoryProviderStorageFileID:metadata.fileID fileName:metadata.fileNameView]]];
@@ -687,14 +687,14 @@
 
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser shareButtonPressedForPhotoAtIndex:(NSUInteger)index
 {
-    tableMetadata *metadata = [self.dataSourceImagesVideos objectAtIndex:index];
+    tableMetadata *metadata = [self.photoDataSource objectAtIndex:index];
     
     [appDelegate.activeMain openWindowShare:metadata];
 }
 
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser deleteButtonPressedForPhotoAtIndex:(NSUInteger)index deleteButton:(UIBarButtonItem *)deleteButton
 {
-    tableMetadata *metadata = [self.dataSourceImagesVideos objectAtIndex:index];
+    tableMetadata *metadata = [self.photoDataSource objectAtIndex:index];
     if (metadata == nil || [CCUtility fileProviderStorageExists:metadata.fileID fileName:metadata.fileNameView] == NO) {
         
         [appDelegate messageNotification:@"_info_" description:@"_file_not_found_" visible:YES delay:k_dismissAfterSecond type:TWMessageBarMessageTypeInfo errorCode:0];
@@ -1018,18 +1018,18 @@
             
             } else {
                 
-                for (NSUInteger index=0; index < [self.dataSourceImagesVideos count] && _photoBrowser; index++ ) {
+                for (NSUInteger index=0; index < [self.photoDataSource count] && _photoBrowser; index++ ) {
                     
-                    tableMetadata *metadataTemp = [self.dataSourceImagesVideos objectAtIndex:index];
+                    tableMetadata *metadataTemp = [self.photoDataSource objectAtIndex:index];
                     
                     if ([metadata isInvalidated] || [metadataTemp.fileID isEqualToString:metadata.fileID]) {
                         
-                        [self.dataSourceImagesVideos removeObjectAtIndex:index];
+                        [self.photoDataSource removeObjectAtIndex:index];
                         [self.photos removeObjectAtIndex:index];
                         [self.photoBrowser reloadData];
                         
                         // exit
-                        if ([self.dataSourceImagesVideos count] == 0) {
+                        if ([self.photoDataSource count] == 0) {
                             [self backNavigationController];
                         }
                     }

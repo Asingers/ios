@@ -806,17 +806,17 @@
         _detailViewController = segue.destinationViewController;
     }
     
-    NSMutableArray *allRecordsDataSourceImagesVideos = [NSMutableArray new];
+    NSMutableArray *photoDataSource = [NSMutableArray new];
     
     for (NSString *fileID in sectionDataSource.allFileID) {
         tableMetadata *metadata = [sectionDataSource.allRecordsDataSource objectForKey:fileID];
-        if ([metadata.typeFile isEqualToString: k_metadataTypeFile_image] || [metadata.typeFile isEqualToString: k_metadataTypeFile_video] || [metadata.typeFile isEqualToString: k_metadataTypeFile_audio])
-            [allRecordsDataSourceImagesVideos addObject:metadata];
+        if ([metadata.typeFile isEqualToString: k_metadataTypeFile_image])
+            [photoDataSource addObject:metadata];
     }
     
     _detailViewController.metadataDetail = self.metadata;
     _detailViewController.dateFilterQuery = nil;
-    _detailViewController.dataSourceImagesVideos = allRecordsDataSourceImagesVideos;
+    _detailViewController.photoDataSource = photoDataSource;
     
     [_detailViewController setTitle:self.metadata.fileNameView];
 }

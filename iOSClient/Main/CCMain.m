@@ -4486,7 +4486,6 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     id viewController = segue.destinationViewController;
-    NSMutableArray *allRecordsDataSourceImagesVideos = [NSMutableArray new];
     tableMetadata *metadata;
     
     if ([viewController isKindOfClass:[UINavigationController class]]) {
@@ -4499,10 +4498,12 @@
         _detailViewController = segue.destinationViewController;
     }
     
+    NSMutableArray *photoDataSource = [NSMutableArray new];
+    
     if ([sender isKindOfClass:[tableMetadata class]]) {
     
         metadata = sender;
-        [allRecordsDataSourceImagesVideos addObject:sender];
+        [photoDataSource addObject:sender];
         
     } else {
         
@@ -4510,13 +4511,13 @@
         
         for (NSString *fileID in sectionDataSource.allFileID) {
             tableMetadata *metadata = [sectionDataSource.allRecordsDataSource objectForKey:fileID];
-            if ([metadata.typeFile isEqualToString: k_metadataTypeFile_image] || [metadata.typeFile isEqualToString: k_metadataTypeFile_video] || [metadata.typeFile isEqualToString: k_metadataTypeFile_audio])
-                [allRecordsDataSourceImagesVideos addObject:metadata];
+            if ([metadata.typeFile isEqualToString: k_metadataTypeFile_image])
+                [photoDataSource addObject:metadata];
         }
     }
     
     _detailViewController.metadataDetail = metadata;
-    _detailViewController.dataSourceImagesVideos = allRecordsDataSourceImagesVideos;
+    _detailViewController.photoDataSource = photoDataSource;
     _detailViewController.dateFilterQuery = nil;
     
     [_detailViewController setTitle:metadata.fileNameView];

@@ -45,7 +45,7 @@
 @property (nonatomic, strong) WKWebView *webView;
 
 // Photo
-@property (nonatomic, strong) NSMutableArray *dataSourceImagesVideos;
+@property (nonatomic, strong) NSMutableArray *photoDataSource;
 @property (nonatomic, strong) MWPhotoBrowser *photoBrowser;
 @property (nonatomic, strong) NSMutableArray *photos;
 
