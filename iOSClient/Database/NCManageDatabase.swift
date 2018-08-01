@@ -1934,6 +1934,22 @@ class NCManageDatabase: NSObject {
         }
     }
     
+    @objc func getTablePhoto(predicate: NSPredicate) -> tableMetadata? {
+        
+        guard self.getAccountActive() != nil else {
+            return nil
+        }
+        
+        let realm = try! Realm()
+        realm.refresh()
+        
+        guard let result = realm.objects(tablePhotos.self).filter(predicate).first else {
+            return nil
+        }
+        
+        return tableMetadata.init(value: result)
+    }
+    
     @objc func createTablePhotos(_ metadatas: [tableMetadata]) {
 
         guard let tableAccount = self.getAccountActive() else {

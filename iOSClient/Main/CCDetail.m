@@ -764,9 +764,9 @@
     }
 }
 
-- (void)downloadPhotoBrowser:(tableMetadata *)metadataForDownload
+- (void)downloadPhotoBrowser:(NSString *)fileID
 {
-    tableMetadata *metadata = [[NCManageDatabase sharedInstance] getMetadataWithPredicate:[NSPredicate predicateWithFormat:@"fileID == %@", metadataForDownload.fileID]];
+    tableMetadata *metadata = [[NCManageDatabase sharedInstance] getTablePhotoWithPredicate:[NSPredicate predicateWithFormat:@"fileID == %@", fileID]];
     if (metadata) {
         NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:metadata.directoryID];
         
