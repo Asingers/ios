@@ -374,8 +374,17 @@
         // Setting Theming
         [appDelegate settingThemingColorBrand];
         
-        // remove all of detail
-        [appDelegate.activeDetail removeAllSubView];
+        // Detail
+        // If AVPlayer in play -> Stop
+        if (appDelegate.player != nil && appDelegate.player.rate != 0) {
+            [appDelegate.player pause];
+        }
+        for (UIView *view in [appDelegate.activeDetail.view subviews]) {
+            if ([view isKindOfClass:[UIImageView class]] == NO) {
+                [view removeFromSuperview];
+            }
+        }
+        appDelegate.activeDetail.title = nil;
         
         // remove all Notification Messages
         [appDelegate.listOfNotifications removeAllObjects];

@@ -58,7 +58,6 @@
 
 @property(nonatomic, weak) IBOutlet UIImageView *imageBackground;
 
-- (void)removeAllSubView;
 - (void)changeToDisplayMode;
 - (void)downloadPhotoBrowserSuccessFailure:(tableMetadata *)metadata selector:(NSString *)selector errorCode:(NSInteger)errorCode;
 

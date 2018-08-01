@@ -107,7 +107,6 @@
     self.tabBarController.tabBar.translucent = YES;
     
     // Open View
-    [self removeAllSubView];
     if ([self.metadataDetail.fileNameView length] > 0 || [self.metadataDetail.directoryID length] > 0 || [self.metadataDetail.fileID length] > 0) {
     
         // open view
@@ -127,7 +126,10 @@
 {
     [super viewDidDisappear:animated];
     
-    [self removeAllSubView];
+    // If AVPlayer in play -> Stop
+    if (appDelegate.player != nil && appDelegate.player.rate != 0) {
+        [appDelegate.player pause];
+    }
 }
 
 - (void)changeTheming
@@ -140,33 +142,8 @@
     }
 }
 
-- (void)removeAllSubView
-{
-    for (UIView *view in [self.view subviews]) {
-        if ([view isKindOfClass:[UIImageView class]] == NO) {
-            [view removeFromSuperview];
-        }
-    }
-    
-    self.webView = nil;
-    self.readerPDFViewController = nil;
-    self.photoBrowser = nil;
-    self.toolbar = nil;
-    
-    [appDelegate.player pause];
-    [appDelegate.player.currentItem.asset cancelLoading];
-    [appDelegate.player.currentItem cancelPendingSeeks];
-    [appDelegate.player cancelPendingPrerolls];
-    [appDelegate.playerController.view removeFromSuperview];
-    appDelegate.player = nil;
-    appDelegate.playerController = nil;
-    
-    self.title = nil;
-}
-
 - (void)backNavigationController
 {
-    [self removeAllSubView];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
