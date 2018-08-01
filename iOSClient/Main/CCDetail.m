@@ -533,7 +533,7 @@
 
         if ([CCUtility fileProviderStorageExists:metadata.fileID fileName:metadata.fileNameView] == NO && metadataDB.status == k_metadataStatusNormal) {
             
-            [self downloadPhotoBrowser:metadata.fileID];
+            [self downloadPhotoBrowser:metadata];
         }
     }
     
@@ -764,23 +764,21 @@
     }
 }
 
-- (void)downloadPhotoBrowser:(NSString *)fileID
+- (void)downloadPhotoBrowser:(tableMetadata *)metadata
 {
-    tableMetadata *metadata = [[NCManageDatabase sharedInstance] getTablePhotoWithPredicate:[NSPredicate predicateWithFormat:@"fileID == %@", fileID]];
-    if (metadata) {
-        NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:metadata.directoryID];
+    tableMetadata *metadataForUpload = [[NCManageDatabase sharedInstance] initNewMetadata:metadata];
+    
+    NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:metadataForUpload.directoryID];
+    if (serverUrl) {
         
-        if (serverUrl) {
-
-            metadata.session = k_download_session;
-            metadata.sessionError = @"";
-            metadata.sessionSelector = selectorLoadViewImage;
-            metadata.status = k_metadataStatusWaitDownload;
-            
-            // Add Metadata for Download
-            (void)[[NCManageDatabase sharedInstance] addMetadata:metadata];
-            [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
-        }
+        metadataForUpload.session = k_download_session;
+        metadataForUpload.sessionError = @"";
+        metadataForUpload.sessionSelector = selectorLoadViewImage;
+        metadataForUpload.status = k_metadataStatusWaitDownload;
+        
+        // Add Metadata for Download
+        (void)[[NCManageDatabase sharedInstance] addMetadata:metadataForUpload];
+        [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
     }
 }
 

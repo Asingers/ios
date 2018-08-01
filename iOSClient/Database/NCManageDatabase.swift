@@ -1906,6 +1906,10 @@ class NCManageDatabase: NSObject {
         }
     }
     
+    @objc func initNewMetadata(_ metadata: tableMetadata) -> tableMetadata {
+        return tableMetadata.init(value: metadata)
+    }
+    
     //MARK: -
     //MARK: Table Photos
     @objc func getTablePhotos(addMetadatasFromUpload: [tableMetadata]) -> [tableMetadata]? {
