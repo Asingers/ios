@@ -98,8 +98,9 @@
         [self setupHTTPCache];
     });
     
-    // Change bar bottom line shadow
+    // Change bar bottom line shadow and remove title back button <"title"
     self.navigationController.navigationBar.shadowImage = [CCGraphics generateSinglePixelImageWithColor:[NCBrandColor sharedInstance].brand];
+    self.navigationController.navigationBar.topItem.title = @"";
     
     // TabBar
     self.tabBarController.tabBar.hidden = YES;
