@@ -380,7 +380,7 @@
             [appDelegate.player pause];
         }
         for (UIView *view in [appDelegate.activeDetail.view subviews]) {
-            if ([view isKindOfClass:[UIImageView class]] == NO) {
+            if ([view isKindOfClass:[UIImageView class]] == NO) { // View Image Nextcloud
                 [view removeFromSuperview];
             }
         }
