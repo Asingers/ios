@@ -749,6 +749,10 @@
     // if a message for a directory of these
     if (![metadata.fileID isEqualToString:fileIDNowVisible])
         return;
+ 
+    // Title
+    self.navigationItem.titleView = nil;
+    self.title = metadata.fileNameView;
     
     if (errorCode == 0) {
         // verifico se esiste l'icona e se la posso creare
@@ -776,6 +780,8 @@
     // Add Metadata for Download
     (void)[[NCManageDatabase sharedInstance] addMetadata:metadataForUpload];
     [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
+    
+    [CCGraphics addImageToTitle:NSLocalizedString(@"_...loading..._", nil) colorTitle:[NCBrandColor sharedInstance].brandText imageTitle:[CCGraphics changeThemingColorImage:[UIImage imageNamed:@"load"] multiplier:2 color:[NCBrandColor sharedInstance].brandText] navigationItem:self.navigationItem];
 }
 
 - (void)insertGeocoderLocation:(NSNotification *)notification
