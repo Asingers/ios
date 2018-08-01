@@ -764,20 +764,23 @@
     }
 }
 
-- (void)downloadPhotoBrowser:(tableMetadata *)metadata
+- (void)downloadPhotoBrowser:(tableMetadata *)metadataForDownload
 {
-    NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:metadata.directoryID];
-    
-    if (serverUrl) {
+    tableMetadata *metadata = [[NCManageDatabase sharedInstance] getMetadataWithPredicate:[NSPredicate predicateWithFormat:@"fileID == %@", metadataForDownload.fileID]];
+    if (metadata) {
+        NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:metadata.directoryID];
         
-        metadata.session = k_download_session;
-        metadata.sessionError = @"";
-        metadata.sessionSelector = selectorLoadViewImage;
-        metadata.status = k_metadataStatusWaitDownload;
-        
-        // Add Metadata for Download
-        (void)[[NCManageDatabase sharedInstance] addMetadata:metadata];
-        [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
+        if (serverUrl) {
+
+            metadata.session = k_download_session;
+            metadata.sessionError = @"";
+            metadata.sessionSelector = selectorLoadViewImage;
+            metadata.status = k_metadataStatusWaitDownload;
+            
+            // Add Metadata for Download
+            (void)[[NCManageDatabase sharedInstance] addMetadata:metadata];
+            [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
+        }
     }
 }
 
@@ -1057,19 +1060,21 @@
 
 - (void)modifyTxtButtonPressed:(UIBarButtonItem *)sender
 {
-    UINavigationController* navigationController = [[UIStoryboard storyboardWithName:@"NCText" bundle:nil] instantiateViewControllerWithIdentifier:@"NCText"];
-    
-    NCText *viewController = (NCText *)navigationController.topViewController;
-    
     tableMetadata *metadata = [[NCManageDatabase sharedInstance] getMetadataWithPredicate:[NSPredicate predicateWithFormat:@"fileID == %@", self.metadataDetail.fileID]];
-    
-    viewController.metadata = metadata;
-    viewController.delegate = self;
-    
-    navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
-    navigationController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    
-    [self presentViewController:navigationController animated:YES completion:nil];
+    if (metadata) {
+        
+        UINavigationController* navigationController = [[UIStoryboard storyboardWithName:@"NCText" bundle:nil] instantiateViewControllerWithIdentifier:@"NCText"];
+        
+        NCText *viewController = (NCText *)navigationController.topViewController;
+        
+        viewController.metadata = metadata;
+        viewController.delegate = self;
+        
+        navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
+        navigationController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        
+        [self presentViewController:navigationController animated:YES completion:nil];
+    }
 }
 
 - (void)actionButtonPressed:(UIBarButtonItem *)sender
