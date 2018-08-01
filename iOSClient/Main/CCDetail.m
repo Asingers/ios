@@ -67,7 +67,6 @@
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(triggerProgressTask:) name:@"NotificationProgressTask" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeTheming) name:@"changeTheming" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backNavigationController) name:@"detailBack" object:nil];
 
         self.metadataDetail = [[tableMetadata alloc] init];
         self.photos = [[NSMutableArray alloc] init];
@@ -1046,6 +1045,12 @@
 - (void)dismissTextView
 {
     if (self.webView) {
+        
+        NSString *fileNamePath = [NSTemporaryDirectory() stringByAppendingString:self.metadataDetail.fileNameView];
+        
+        [[NSFileManager defaultManager] removeItemAtPath:fileNamePath error:nil];
+        [[NSFileManager defaultManager] linkItemAtPath:[CCUtility getDirectoryProviderStorageFileID:self.metadataDetail.fileID fileName:self.metadataDetail.fileNameView] toPath:fileNamePath error:nil];
+        
         [self.webView reload];
     }
 }
@@ -1056,7 +1061,9 @@
     
     NCText *viewController = (NCText *)navigationController.topViewController;
     
-    viewController.metadata = self.metadataDetail;
+    tableMetadata *metadata = [[NCManageDatabase sharedInstance] getMetadataWithPredicate:[NSPredicate predicateWithFormat:@"fileID == %@", self.metadataDetail.fileID]];
+    
+    viewController.metadata = metadata;
     viewController.delegate = self;
     
     navigationController.modalPresentationStyle = UIModalPresentationPageSheet;

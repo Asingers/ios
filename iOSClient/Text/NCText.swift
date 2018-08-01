@@ -167,16 +167,14 @@ class NCText: UIViewController, UITextViewDelegate {
                 
                     self.dismiss(animated: true, completion: {
                         
-                        self.delegate?.dismissTextView()
-                        
                         metadata.session = k_upload_session
                         metadata.sessionSelector = selectorUploadFile
                         metadata.status = Int(k_metadataStatusWaitUpload)
 
                         _ = NCManageDatabase.sharedInstance.addMetadata(metadata)
                         self.appDelegate.perform(#selector(self.appDelegate.loadAutoDownloadUpload), on: Thread.main, with: nil, waitUntilDone: true)
-
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "detailBack"), object: nil)
+                        
+                        self.delegate?.dismissTextView()
                     })
 
                 } else {
