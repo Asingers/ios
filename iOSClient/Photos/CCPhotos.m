@@ -815,7 +815,8 @@
     NSMutableArray *allRecordsDataSourceImagesVideos = [NSMutableArray new];
     for (NSString *fileID in sectionDataSource.allFileID) {
         tableMetadata *metadata = [sectionDataSource.allRecordsDataSource objectForKey:fileID];
-        [allRecordsDataSourceImagesVideos addObject:metadata];
+        if ([metadata.typeFile isEqualToString: k_metadataTypeFile_image] || [metadata.typeFile isEqualToString: k_metadataTypeFile_video] || [metadata.typeFile isEqualToString: k_metadataTypeFile_audio])
+            [allRecordsDataSourceImagesVideos addObject:metadata];
     }
     
     self.detailViewController.dataSourceImagesVideos = allRecordsDataSourceImagesVideos;
