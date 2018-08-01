@@ -745,8 +745,8 @@
                         self.metadata.status = k_metadataStatusWaitDownload;
                         
                         // Add Metadata for Download
-                        (void)[[NCManageDatabase sharedInstance] addMetadata:self.metadata];
-                        [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
+                        tableMetadata *metadata = [[NCManageDatabase sharedInstance] addMetadata:self.metadata];
+                        [[CCNetworking sharedNetworking] downloadFile:metadata taskStatus:k_taskStatusResume delegate:self];
                         
                         [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
                     }
