@@ -724,14 +724,33 @@
                             
             } else {
             
-                self.metadata.session = k_download_session;
-                self.metadata.sessionError = @"";
-                self.metadata.sessionSelector = selectorLoadFileView;
-                self.metadata.status = k_metadataStatusWaitDownload;
+                tableDirectory *tableDirectory = [[NCManageDatabase sharedInstance] getTableDirectoryWithPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND serverUrl == %@", appDelegate.activeAccount, serverUrl]];
                 
-                // Add Metadata for Download
-                tableMetadata *metadata = [[NCManageDatabase sharedInstance] addMetadata:self.metadata];
-                [[CCNetworking sharedNetworking] downloadFile:metadata taskStatus:k_taskStatusResume delegate:self];
+                if (tableDirectory.e2eEncrypted && ![CCUtility isEndToEndEnabled:appDelegate.activeAccount]) {
+                    
+                    [appDelegate messageNotification:@"_info_" description:@"_e2e_goto_settings_for_enable_" visible:YES delay:k_dismissAfterSecond type:TWMessageBarMessageTypeInfo errorCode:0];
+                    
+                } else {
+                    
+                    if (([self.metadata.typeFile isEqualToString: k_metadataTypeFile_video] || [self.metadata.typeFile isEqualToString: k_metadataTypeFile_audio]) && self.metadata.e2eEncrypted == NO) {
+                        
+                        if ([self shouldPerformSegue])
+                            [self performSegueWithIdentifier:@"segueDetail" sender:self];
+                        
+                    } else {
+                        
+                        self.metadata.session = k_download_session;
+                        self.metadata.sessionError = @"";
+                        self.metadata.sessionSelector = selectorLoadFileView;
+                        self.metadata.status = k_metadataStatusWaitDownload;
+                        
+                        // Add Metadata for Download
+                        (void)[[NCManageDatabase sharedInstance] addMetadata:self.metadata];
+                        [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
+                        
+                        [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    }
+                }
             }
         }
     }
