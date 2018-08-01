@@ -364,6 +364,7 @@
 
     appDelegate.playerController.player = appDelegate.player;
     appDelegate.playerController.view.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - TOOLBAR_HEIGHT - safeAreaBottom);
+    appDelegate.playerController.allowsPictureInPicturePlayback = false;
     [self addChildViewController:appDelegate.playerController];
     [self.view addSubview:appDelegate.playerController.view];
     [appDelegate.playerController didMoveToParentViewController:self];
