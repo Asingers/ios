@@ -768,18 +768,14 @@
 {
     tableMetadata *metadataForUpload = [[NCManageDatabase sharedInstance] initNewMetadata:metadata];
     
-    NSString *serverUrl = [[NCManageDatabase sharedInstance] getServerUrl:metadataForUpload.directoryID];
-    if (serverUrl) {
+    metadataForUpload.session = k_download_session;
+    metadataForUpload.sessionError = @"";
+    metadataForUpload.sessionSelector = selectorLoadViewImage;
+    metadataForUpload.status = k_metadataStatusWaitDownload;
         
-        metadataForUpload.session = k_download_session;
-        metadataForUpload.sessionError = @"";
-        metadataForUpload.sessionSelector = selectorLoadViewImage;
-        metadataForUpload.status = k_metadataStatusWaitDownload;
-        
-        // Add Metadata for Download
-        (void)[[NCManageDatabase sharedInstance] addMetadata:metadataForUpload];
-        [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
-    }
+    // Add Metadata for Download
+    (void)[[NCManageDatabase sharedInstance] addMetadata:metadataForUpload];
+    [appDelegate performSelectorOnMainThread:@selector(loadAutoDownloadUpload) withObject:nil waitUntilDone:YES];
 }
 
 - (void)insertGeocoderLocation:(NSNotification *)notification
