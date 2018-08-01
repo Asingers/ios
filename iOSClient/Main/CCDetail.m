@@ -33,7 +33,7 @@
 
 #define alertRequestPasswordPDF 1
 
-@interface CCDetail ()
+@interface CCDetail () <NCTextDelegate>
 {
     AppDelegate *appDelegate;
         
@@ -1043,6 +1043,13 @@
 #pragma mark ===== ButtonPressed =====
 #pragma --------------------------------------------------------------------------------------------
 
+- (void)dismissTextView
+{
+    if (self.webView) {
+        [self.webView reload];
+    }
+}
+
 - (void)modifyTxtButtonPressed:(UIBarButtonItem *)sender
 {
     UINavigationController* navigationController = [[UIStoryboard storyboardWithName:@"NCText" bundle:nil] instantiateViewControllerWithIdentifier:@"NCText"];
@@ -1050,6 +1057,7 @@
     NCText *viewController = (NCText *)navigationController.topViewController;
     
     viewController.metadata = self.metadataDetail;
+    viewController.delegate = self;
     
     navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
     navigationController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
